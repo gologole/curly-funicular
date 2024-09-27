@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package api;
+option go_package = "rpc/storagepb";
+
+service Storage{
+  rpc GetFile(FileRequest) returns (stream File) {}
+  rpc UploadFile(stream PutFileRequest) returns (Response) {}
+  rpc DeleteFile(FileRequest) returns (Response) {}
+  rpc GetFileList(FileListRequest) returns (FileListResponse){}
+}
+
+message File {
+  string name = 1;
+  bytes data = 2;
+  string hashfile =3;
+}
+
+message FileRequest {
+  string name = 1;
+  int32 userid = 2;
+}
+
+message PutFileRequest {
+  string name = 1;
+  bytes data = 2;
+  int32 userid = 3;
+  string hashfile = 4;
+}
+
+message Response{
+  bool success = 1;
+  string err = 2;
+}
+
+message FileListRequest {
+  int32 userid = 1;
+}
+
+message FileListResponse{
+  repeated File files = 1;
+}

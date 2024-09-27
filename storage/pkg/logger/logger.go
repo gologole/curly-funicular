@@ -1,4 +1,4 @@
-package pkg
+package logger
 
 import (
 	"bytes"
@@ -8,9 +8,24 @@ import (
 	"os"
 )
 
+/*Структурированные логи: Для каждого лога добавляются поля:
+
+    module — указывает на компонент системы (например, api, db, processor).
+    action — действие, которое выполняется в момент логирования (например, fetch_data, connect,
+process_data).
+    request_id — уникальный идентификатор запроса.
+    user_id — уникальный идентификатор пользователя.
+
+Дополнительные поля: К примеру, в logger.Warn добавлено поле retry_after,
+указывающее время повторной попытки.
+
+Заполнение полей: Эти поля позволяют создавать более структурированные и детализированные логи,
+которые удобнее анализировать через Kibana.*/
+
 // Функция для отправки логов в Logstash
 func sendLogToLogstash(logstashURL string, logEntry []byte) error {
-	req, err := http.NewRequest("POST", logstashURL, bytes.NewBuffer(logEntry))
+	req, err := http.NewRequest("POST", os.Getenv("ELK_DOMAIN"), // logstash:5044
+		bytes.NewBuffer(logEntry))
 	if err != nil {
 		return err
 	}
@@ -49,7 +64,7 @@ func (w *logstashWriter) Sync() error {
 }
 
 // Функция для настройки zap логгера
-func configureLogger(logstashURL string) *zap.Logger {
+func ConfigureLogger(logstashURL string) *zap.Logger {
 	// Создаем конфигурацию для вывода в консоль (Stdout)
 	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewProductionEncoderConfig())
 	consoleWriteSyncer := zapcore.Lock(os.Stdout)

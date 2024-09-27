@@ -1,0 +1,79 @@
+version: '3'
+
+services:
+  elasticsearch:
+    image: elasticsearch:8.9.0  # Образ из Docker Hub
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    networks:
+      - elk
+
+  logstash:
+    image: logstash:8.9.0  # Попробуйте использовать этот образ
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+    ports:
+      - "5044:5044"  # Для приема логов через Logstash Beats
+      - "8080:8080"  # Для приема HTTP-запросов с логами
+    environment:
+      - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: kibana:8.9.0
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+  fileserve:
+    build:
+      context: ./storage
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+      - redis
+      - logstash  # Заменяем elk на logstash, чтобы обеспечить зависимость
+    networks:
+      - app-network
+    ports:
+      - "50051:50051"
+    environment:
+      - ELK_DOMAIN=logstash:5044  # Домен для отправки логов
+
+  postgres:
+    image: postgres:15
+    container_name: psg
+    environment:
+      POSTGRES_DB: my_database
+      POSTGRES_USER: my_user
+      POSTGRES_PASSWORD: my_password
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  redis:
+    image: redis:alpine
+    container_name: redisdomain
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+networks:
+  elk:
+    driver: bridge
+  app-network:
+    driver: bridge

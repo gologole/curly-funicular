@@ -1,0 +1,18 @@
+postgres:
+  host: "psg"
+  port: 5432
+  database: "my_database"
+  user: "my_user"
+  password: "my_password"
+
+redis:
+  address: "http://redisdomain"
+  password: ""
+  db: 0
+
+http_server:
+  port: 8080
+  elk_domain: "http://logstash:5044"
+
+grpc_server:
+  port: 50051
