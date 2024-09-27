@@ -34,8 +34,10 @@ func main() {
 		panic("can't migrate :    " + er.Error())
 	}
 	log.Println("Database migrate")
-	cache := cache.NewCache(cfg)
 
+	cache := cache.NewCache(cfg)
+	cache.Connect()
+	log.Println("Cache initialized")
 	myservice := service.NewService(cfg, db, cache)
 
 	// Настройка прослушивания на определенном порту

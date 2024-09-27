@@ -1,0 +1,15 @@
+для запуска auth service: go run jwt/main.go
+
+для тестов auth service(должен быть установлен grpcurl)
+ grpcurl -plaintext -import-path ./ -proto auth.proto -d '{"username": "user", "password": "password"}' localhost:50051 auth.AuthService/Login
+
+
+
+
+
+для запуска elk+storage 
+docker-compose up 
+
+для тестов make run_elktest после чего в logstash отобразятся логи ,а в терминал придут ответы от grpc-storage,а также redis обогатиться данными 
+
+http://0.0.0.0:5601

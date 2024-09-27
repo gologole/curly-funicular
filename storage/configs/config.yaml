@@ -6,7 +6,7 @@ postgres:
   password: "my_password"
 
 redis:
-  address: "http://redisdomain"
+  address: "redisdomain:6379"
   password: ""
   db: 0
 

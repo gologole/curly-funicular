@@ -73,7 +73,6 @@ func (d database) UploadFile(file models.File) error {
 	sql := `INSERT INTO files VALUES($1,$2,$3,$4,$5,$6)`
 	_, err := d.conn.Exec(sql, file.Name, file.Size, file.Data, file.ContentType, file.UserID, file.Hash)
 	return err
-
 }
 
 func (d database) DeleteFile(name string, userID string) error {
@@ -83,13 +82,13 @@ func (d database) DeleteFile(name string, userID string) error {
 }
 
 func (d database) GetFilesByUserID(userID string) ([]models.SimpleFileView, error) {
-	sql := `SELECT id, name, file_size, created_at FROM files WHERE user_id = $1`
+	sql := `SELECT id, name, file_size, added_at FROM files WHERE user_id = $1`
 	var files []models.SimpleFileView
 	rows, err := d.conn.Query(sql, userID)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close() // Важно закрывать ресурсы после использования
+	defer rows.Close()
 
 	for rows.Next() {
 		var file models.SimpleFileView
@@ -100,7 +99,6 @@ func (d database) GetFilesByUserID(userID string) ([]models.SimpleFileView, erro
 		files = append(files, file)
 	}
 
-	// Проверка на ошибки, возникшие во время итерации по строкам
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
