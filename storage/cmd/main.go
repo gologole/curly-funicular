@@ -14,6 +14,7 @@ import (
 	"log"
 	"net"
 	"strconv"
+	"time"
 )
 
 func main() {
@@ -27,11 +28,12 @@ func main() {
 	defer elkLogger.Sync()
 
 	db, err := db2.NewDatabase(cfg)
-
+	log.Println("Database initialized")
 	er := db.Migrate()
 	if er != nil {
 		panic("can't migrate :    " + er.Error())
 	}
+	log.Println("Database migrate")
 	cache := cache.NewCache(cfg)
 
 	myservice := service.NewService(cfg, db, cache)
@@ -51,9 +53,10 @@ func main() {
 
 	// Включаем возможность проверки зарегистрированных сервисов через gRPC reflection (для отладки)
 	reflection.Register(grpcServer)
-
-	// Запускаем gRPC сервер
+	time.Sleep(time.Minute)
+	fmt.Println("Server registered")
 	elkLogger.Info("Server registered")
+
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Ошибка запуска gRPC сервера: %v", err)
 	}

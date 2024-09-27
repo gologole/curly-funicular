@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"log"
 	"net/http"
 	"os"
 )
@@ -27,6 +28,7 @@ func sendLogToLogstash(logstashURL string, logEntry []byte) error {
 	req, err := http.NewRequest("POST", os.Getenv("ELK_DOMAIN"), // logstash:5044
 		bytes.NewBuffer(logEntry))
 	if err != nil {
+		log.Printf("НЕТ СВЯЗИ С ELK")
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")

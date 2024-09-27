@@ -40,6 +40,7 @@ func NewDatabase(cfg *configs.Config) (Database, error) {
 		log.Println("Database is still starting up, retrying in 2 seconds...")
 		time.Sleep(2 * time.Second)
 	}
+
 	return &database{conn: conn, config: cfg}, nil
 }
 
